@@ -1,9 +1,11 @@
+const { NoCliCommandType } = require("nocli-handler.js")
+
 /**
  * @type {import("nocli-handler.js").ICommand}
  */
 const Command = {
     description: "Clears messages possible in a channel",
-    type: "BOTH",
+    type: NoCliCommandType.Both,
     deferReply: true,
     guildOnly: true,
     minArgs: 1,

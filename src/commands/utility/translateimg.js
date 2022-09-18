@@ -1,17 +1,19 @@
+const { ApplicationCommandOptionType } = require('discord.js');
+const { NoCliCommandType } = require('nocli-handler.js');
 const { createWorker } = require('tesseract.js');
 
 /**
  * @type {import("nocli-handler.js").ICommand}
  */
 const Command = {
-    type: "BOTH",
+    type: NoCliCommandType.Both,
     description: "translate images",
     testOnly: true,
     options: [
         {
             name: "image",
             description: "image to translate",
-            type: 'ATTACHMENT',
+            type: ApplicationCommandOptionType.Attachment,
             required: true,
         }
     ],

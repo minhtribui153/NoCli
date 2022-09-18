@@ -1,38 +1,59 @@
 require('dotenv/config');
-const { Client, Intents, version } = require('discord.js');
+const { Client, Partials, IntentsBitField } = require('discord.js');
+
 const NoCliHandler = require('nocli-handler.js').default;
 const path = require('path');
 
 const client = new Client({
     intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_MESSAGE_TYPING,
-        Intents.FLAGS.DIRECT_MESSAGES,
+        IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.GuildMessageReactions,
+        IntentsBitField.Flags.DirectMessages,
+        IntentsBitField.Flags.MessageContent,
+        IntentsBitField.Flags.GuildMessageTyping
     ],
-    partials: ["CHANNEL"],
+    partials: [Partials.Channel, Partials.Message],
 });
 
 const instance = new NoCliHandler({
-    client,                                    // The Discord.JS Client you initialized
+    client,
     mongoDB: {
-        uri: process.env.MONGO_URI,            // The MongoDB URI
-        options: {}                            // The MongoDB options (optional)
+        uri: process.env.MONGO_URI,
+        options: { keepAlive: true },
     },
     configuration: {
-        defaultPrefix: "",                     // Sets the default prefix (default = "!")
-        commandsDir: path.join(__dirname, 'commands'), // Sets the directory where the commands are located
-        featuresDir: path.join(__dirname, ''), // Sets the directory where the features are located (will be implemented in the next version)
+        defaultPrefix: "",
+        commandsDir: path.join(__dirname, 'commands'),
+        events: {
+            dir: path.join(__dirname, 'events'),
+            validations: {
+                interactionCreate: {
+                    isButton: interaction => interaction.isButton(),
+                },
+            }
+        },
     },
     debugging: {
-        showFullErrorLog: false,               // Whether or not to show the full error log (default = false)
-        showBanner: true,                      // Whether or not to show the banner upon the start of the program (default = true)
+        showFullErrorLog: false,
+        showBanner: true,
     },
-    clientVersion: version,                  // Your current Discord.JS version
-    testServers: ['847276814169669633', '789041271670177803'],    // Array of server IDs that will be used for testing (default = [])
-    botOwners: ['710319131983085599'],    // Array of user IDs that are the bot owners (default = [])
-    language: "JavaScript",                    // The language you are using to develop your Discord.JS Bot
+    cooldownConfig: {
+        defaultErrorMessage: "Please wait for [TIME]",
+        botOwnersBypass: false,
+        dbRequired: 500 // 5 minutes
+    },
+    testServers: ['847276814169669633', '789041271670177803'],
+    botOwners: [],
+    language: "JavaScript",
+    disabledDefaultCommands: ["channelcommand"],
+    emojiConfig: {
+        disabled: "<:switch_false:1011202284174192670>",
+        enabled: "<:switch_true:1011202296694194256>",
+        error: "<:nocli_error:999917634176946216>",
+        info: "<:nocli_info:999920952819339314>",
+        success: "<:nocli_checkmark:999917636072771698>"
+    }
 });
 
 client.login(process.env.TOKEN)
